@@ -11,7 +11,7 @@ An unofficial headless capture client and installable Codex Skill for the ALIENT
 - Supports 16 digital channels and the commonly available sample rates
 - Exports per-channel packed binary samples, JSON metadata, VCD waveforms, and raw USB data
 - Includes 10 Mbps FlexRay frame decoding, CRC validation, and waveform timing reports
-- Provides optional pico-flexray slot10 `with11` / `without11` bench checks
+- Keeps protocol decoding extensible so additional decoders can be implemented for user-requested protocols
 
 Only Stream mode is exported safely. Buffer mode is deliberately rejected because ring-buffer trigger offsets are not yet handled completely.
 
@@ -125,7 +125,11 @@ python3 scripts/atk_logic_headless.py capture \
   --flexray-channel-type A
 ```
 
-The slot10 options are helpers for the pico-flexray test bench. General capture and FlexRay decoding do not depend on that project.
+## Adding Protocol Decoders
+
+FlexRay is currently built in. Additional protocol decoders can be added when users provide a public specification or enough protocol details and representative samples to validate the implementation.
+
+New decoders should remain isolated from the USB capture path, use opt-in CLI arguments, emit structured records into the JSON metadata, and include tests for valid, invalid, truncated, and idle-only input. When this repository is installed as a Codex Skill, the bundled `SKILL.md` directs Codex to implement and validate a requested decoder instead of treating unsupported protocols as already available.
 
 ## Source and License
 

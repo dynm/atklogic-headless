@@ -13,7 +13,7 @@ Unofficial headless capture client and Codex Skill for the ALIENTEK ATK-Logic DL
 - 支持 16 个数字通道和常用采样率
 - 输出逐通道 packed binary、JSON 元数据、VCD 波形及原始 USB 数据
 - 内置 10 Mbps FlexRay 帧解码、CRC 检查和波形时序报告
-- 提供 pico-flexray slot10 `with11` / `without11` 测试辅助功能
+- 保持协议解码层可扩展，可根据用户需求实现其他协议解码器
 
 目前只安全导出 Stream 模式。Buffer 模式由于环形缓冲区偏移尚未完整处理，会被程序主动拒绝。
 
@@ -127,7 +127,11 @@ python3 scripts/atk_logic_headless.py capture \
   --flexray-channel-type A
 ```
 
-slot10 相关参数是 pico-flexray 测试台辅助功能；通用采集和 FlexRay 解码不依赖该项目。
+## 增加协议解码器
+
+当前内置 FlexRay 解码。用户提供公开规范，或给出足够的协议细节及代表性样本后，可以继续增加其他协议解码器。
+
+新增解码器应与 USB 采集路径隔离，使用显式启用的 CLI 参数，将结构化结果写入 JSON 元数据，并覆盖正常帧、错误帧、截断帧和纯空闲输入测试。以 Codex Skill 安装本仓库后，`SKILL.md` 会指导 Codex 实现并验证用户要求的解码器，而不会把尚未支持的协议描述为已有功能。
 
 ## 来源与许可证
 

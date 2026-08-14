@@ -1,4 +1,4 @@
 interface:
   display_name: "ATKLogic Headless"
-  short_description: "Headless ATK-Logic capture and FlexRay checks"
-  default_prompt: "Use $atklogic-headless to probe my ATK-Logic analyzer and capture channels 0 and 1 at 100 MHz."
+  short_description: "Headless capture and extensible protocol decoding"
+  default_prompt: "Use $atklogic-headless to capture logic signals, decode a supported protocol, or add and validate a requested protocol decoder."
