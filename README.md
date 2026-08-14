@@ -1,34 +1,34 @@
 # atklogic-headless
 
-面向 ALIENTEK ATK-Logic DL16 系列逻辑分析仪的非官方无 GUI 采集工具，同时提供可直接安装的 Codex Skill。
+[English](README.md) | [Chinese](README_CN.md)
 
-Unofficial headless capture client and Codex Skill for the ALIENTEK ATK-Logic DL16 family.
+An unofficial headless capture client and installable Codex Skill for the ALIENTEK ATK-Logic DL16 family of logic analyzers.
 
-## 功能
+## Features
 
-- 通过 PyUSB 探测和操作 `1a86:ffcc` 设备
-- 支持立即采集以及低电平、高电平、上升沿、下降沿和双沿触发
-- 支持 16 个数字通道和常用采样率
-- 输出逐通道 packed binary、JSON 元数据、VCD 波形及原始 USB 数据
-- 内置 10 Mbps FlexRay 帧解码、CRC 检查和波形时序报告
-- 提供 pico-flexray slot10 `with11` / `without11` 测试辅助功能
+- Discovers and operates USB devices with VID:PID `1a86:ffcc` through PyUSB
+- Supports immediate capture and low-level, high-level, rising-edge, falling-edge, and both-edge triggers
+- Supports 16 digital channels and the commonly available sample rates
+- Exports per-channel packed binary samples, JSON metadata, VCD waveforms, and raw USB data
+- Includes 10 Mbps FlexRay frame decoding, CRC validation, and waveform timing reports
+- Keeps protocol decoding extensible so additional decoders can be implemented for user-requested protocols
 
-目前只安全导出 Stream 模式。Buffer 模式由于环形缓冲区偏移尚未完整处理，会被程序主动拒绝。
+Only Stream mode is exported safely. Buffer mode is deliberately rejected because ring-buffer trigger offsets are not yet handled completely.
 
-## 已验证硬件
+## Validated Hardware
 
-2026-08-14 在 ATK-Logic DL16 系列设备上完成：
+The following tests were completed on an ATK-Logic DL16-family device on 2026-08-14:
 
-- MCU 探测与版本查询
-- 100 MHz、双通道、10 ms 立即采集
-- 100 MHz、单通道、2 ms 低电平触发采集
-- JSON、VCD、packed channel 和 USB raw 输出一致性检查
+- MCU discovery and version query
+- 100 MHz, two-channel, 10 ms immediate capture
+- 100 MHz, one-channel, 2 ms low-level triggered capture
+- Consistency checks for JSON, VCD, packed-channel, and raw USB outputs
 
-不同硬件和固件版本仍可能存在差异，欢迎提交 issue 并附上命令、错误输出和设备版本。
+Other hardware and firmware revisions may behave differently. When reporting an issue, include the command, complete error output, and device version.
 
-## 安装
+## Installation
 
-需要 Python 3、PyUSB 和系统 libusb。
+Python 3, PyUSB, and a system libusb installation are required.
 
 ```bash
 git clone https://github.com/dynm/atklogic-headless.git
@@ -38,33 +38,33 @@ source .venv/bin/activate
 python3 -m pip install -r requirements.txt
 ```
 
-macOS 可通过 Homebrew 安装 libusb：
+Install libusb with Homebrew on macOS:
 
 ```bash
 brew install libusb
 ```
 
-Debian/Ubuntu 可安装运行库：
+Install the runtime library on Debian or Ubuntu:
 
 ```bash
 sudo apt install libusb-1.0-0
 ```
 
-安装为个人 Codex Skill：
+To install the repository as a personal Codex Skill:
 
 ```bash
 git clone https://github.com/dynm/atklogic-headless.git ~/.codex/skills/atklogic-headless
 ```
 
-## 使用
+## Usage
 
-先关闭可能占用 USB 接口的 ATK-Logic GUI，然后探测设备：
+Close the ATK-Logic GUI or any other program that may hold the USB interface, then probe the analyzer:
 
 ```bash
 python3 scripts/atk_logic_headless.py probe
 ```
 
-立即采集 USB CH0 和 CH1：
+Capture USB CH0 and CH1 immediately:
 
 ```bash
 python3 scripts/atk_logic_headless.py capture \
@@ -76,7 +76,7 @@ python3 scripts/atk_logic_headless.py capture \
   --instant
 ```
 
-下降沿触发：
+Capture on a falling-edge trigger:
 
 ```bash
 python3 scripts/atk_logic_headless.py capture \
@@ -89,30 +89,30 @@ python3 scripts/atk_logic_headless.py capture \
   --trigger-position 10
 ```
 
-通道编号从零开始：USB `CH0` 对应面板 `CH1`。Stream 模式限制为：
+Channel IDs are zero-based: USB `CH0` is front-panel `CH1`. Stream mode has the following limits:
 
-- 1–3 个通道：最高 100 MHz
-- 4–6 个通道：最高 50 MHz
-- 7–16 个通道：最高 20 MHz
+- 1–3 channels: up to 100 MHz
+- 4–6 channels: up to 50 MHz
+- 7–16 channels: up to 20 MHz
 
-查看所有参数：
+List all capture options with:
 
 ```bash
 python3 scripts/atk_logic_headless.py capture --help
 ```
 
-## 输出格式
+## Output Formats
 
-对于输出前缀 `PREFIX`：
+For an output prefix named `PREFIX`, the client writes:
 
-- `PREFIX.json`：采集配置、边沿摘要和解码结果
-- `PREFIX.vcd`：可由 GTKWave 等工具打开的波形
-- `PREFIX.chN.bin`：LSB-first packed samples
-- `PREFIX.usb.bin`：用于故障定位的原始 USB 数据
+- `PREFIX.json`: capture configuration, edge summaries, and decode results
+- `PREFIX.vcd`: a waveform that can be opened with GTKWave or another VCD viewer
+- `PREFIX.chN.bin`: LSB-first packed samples for channel N
+- `PREFIX.usb.bin`: raw USB data for troubleshooting
 
-Packed 数据中，样本 `N` 位于字节 `N // 8` 的 bit `N & 7`。
+In a packed channel file, sample `N` is bit `N & 7` of byte `N // 8`.
 
-## FlexRay 解码
+## FlexRay Decoding
 
 ```bash
 python3 scripts/atk_logic_headless.py capture \
@@ -125,17 +125,21 @@ python3 scripts/atk_logic_headless.py capture \
   --flexray-channel-type A
 ```
 
-slot10 相关参数是 pico-flexray 测试台辅助功能；通用采集和 FlexRay 解码不依赖该项目。
+## Adding Protocol Decoders
 
-## 来源与许可证
+FlexRay is currently built in. Additional protocol decoders can be added when users provide a public specification or enough protocol details and representative samples to validate the implementation.
 
-USB 协议实现参考并移植自 ALIENTEK 官方公开仓库 [`alientek-openedv/atk-logic`](https://github.com/alientek-openedv/atk-logic)，基准提交：
+New decoders should remain isolated from the USB capture path, use opt-in CLI arguments, emit structured records into the JSON metadata, and include tests for valid, invalid, truncated, and idle-only input. When this repository is installed as a Codex Skill, the bundled `SKILL.md` directs Codex to implement and validate a requested decoder instead of treating unsupported protocols as already available.
+
+## Source and License
+
+The USB protocol implementation is adapted from the official public ALIENTEK repository, [`alientek-openedv/atk-logic`](https://github.com/alientek-openedv/atk-logic), at baseline commit:
 
 ```text
 0dff562d24436def2bec3791684f1911997b9e35
 ```
 
-主要公开参考文件包括：
+The primary public reference files are:
 
 - `pv/usb/usb_base.cpp`
 - `pv/usb/usb_control.cpp`
@@ -143,15 +147,15 @@ USB 协议实现参考并移植自 ALIENTEK 官方公开仓库 [`alientek-opened
 - `pv/controller/session_controller.cpp`
 - `pv/data/session.cpp`
 
-面向不同设备版本的兼容差异通过自有硬件 A/B 试验确定。本仓库不包含厂商应用程序、固件、抓包样本或其他非公开资源。
+Compatibility differences between device revisions are determined through A/B tests on hardware owned by the maintainers. This repository does not include vendor applications, firmware, capture samples, or other non-public resources.
 
-上游项目采用 GPL-3.0-or-later；本项目作为 Python 移植和扩展，同样整体采用 [GPL-3.0-or-later](LICENSE)。修改日期为 2026-08-14。
+The upstream project is licensed under GPL-3.0-or-later. This Python port and its extensions are likewise distributed as a whole under [GPL-3.0-or-later](LICENSE). The relevant modification date is 2026-08-14.
 
-这是非官方社区项目，与 ALIENTEK 没有隶属或背书关系。ATK-Logic 等名称及商标归其各自权利人所有。
+This is an unofficial community project and is not affiliated with or endorsed by ALIENTEK. ATK-Logic and any other names or trademarks belong to their respective owners.
 
-## 安全提示
+## Safety
 
-- 连接目标电路前确认分析仪和目标设备共地。
-- 阈值必须适合目标逻辑电平。
-- 原始 USB 数据和波形可能包含被测系统信息，公开 issue 前请先检查。
-- 固件升级、PWM 和其他写入型设备管理功能不在本工具范围内。
+- Ensure the analyzer and target share ground before connecting signal probes.
+- Select a threshold appropriate for the target logic level.
+- Raw USB data and waveforms may contain information from the system under test; inspect them before attaching them to a public issue.
+- Firmware updates, PWM control, and other device-management write operations are outside this tool's scope.
